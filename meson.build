@@ -25,6 +25,7 @@ args = [
     '-DGTK_DISABLE_DEPRECATED',
     '-DGDK_DISABLE_DEPRECATED',
     '-xc',
+    '-D_POSIX_C_SOURCE=200112L'
 ]
 
 if get_option('colored-log')
