@@ -1,0 +1,7 @@
+libgtk-3-dev
+libpipewire-0.3-dev
+libnm-dev
+libglib2.0-dev
+pkg-config
+clang
+lld

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/better/better-control">
+    <!-- <file>assets/styles/tabs/network.css</file>
+    <file>assets/styles/tabs/volume.css</file> -->
+    <file>assets/styles/main.css</file>
+
+    <file>assets/ui/tabs/network.xml</file>
+    <file>assets/ui/tabs/volume.xml</file>
+    <file>assets/ui/main.xml</file>
+  </gresource>
+</gresources>

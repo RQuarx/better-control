@@ -1,0 +1,15 @@
+option(
+    'sound-module',
+    type: 'boolean',
+    value: true,
+    description: 'whether to enable the sound module, uses pipewire',
+)
+
+option(
+    'network-module',
+    type: 'boolean',
+    value: true,
+    description: 'whether to enable the network module, uses network manager',
+)
+
+option('colored-log', type: 'boolean', value: true)
