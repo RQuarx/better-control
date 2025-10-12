@@ -3,66 +3,50 @@ name: CI
 on:
     push:
         paths:
-            - "**/meson.build"
-            - "**/meson_options.txt"
-            - "**/*.meson"
-            - ".github/workflows/*.yml"
-            - ".github/workflows/*.yaml"
-            - "**/*.c"
-            - "**/*.h"
+            - '**/meson.build'
+            - '**/meson_options.txt'
+            - '**/*.meson'
+            - '.github/workflows/*'
+            - '**/*.jsonc'
+            - '**/*.json'
+            - '**/*.xml'
+            - '**/*.css'
+            - '**/*.c'
+            - '**/*.h'
 
 permissions:
     contents: read
 
 jobs:
-    clang:
-        name: Build with Clang
+    build:
         runs-on: ubuntu-latest
+        container:
+            image: alpine:latest
+
+        strategy:
+            matrix:
+                compiler: [clang, gcc]
+
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout
+              uses: actions/checkout@v4
 
-            - name: Cache pip
-              uses: actions/cache@v4
-              with:
-                  path: ~/.cache/pip
-                  key: ${{ runner.os }}-pip-meson
-                  restore-keys: |
-                      ${{ runner.os }}-pip-
-
-            - name: Install dependencies and Meson
+            - name: Install dependencies
               run: |
-                  sudo apt-get update
-                  sudo apt-get install -y python3-pip ninja-build
-                  pip3 install meson
-                  xargs -a .github/dependencies sudo apt-get install -y
+                apk add --no-cache \
+                    bash git build-base \
+                    clang lld gcc \
+                    pkgconf ninja meson \
+                    gtk+3.0-dev pipewire-dev \
+                    networkmanager-dev glib-dev
 
-            - name: Compile
+            - name: Configure (Meson)
               run: |
-                  CXX=clang++ CXX_LD=lld meson setup target
-                  meson compile -C target
+                if [ "${{ matrix.compiler }}" = "clang" ]; then
+                    CC=clang LD=lld meson setup builddir --buildtype=release
+                else
+                    CC=gcc meson setup builddir --buildtype=release
+                fi
 
-    gcc:
-        name: Build with GCC
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Cache pip
-              uses: actions/cache@v4
-              with:
-                  path: ~/.cache/pip
-                  key: ${{ runner.os }}-pip-meson
-                  restore-keys: |
-                      ${{ runner.os }}-pip-
-
-            - name: Install dependencies and Meson
-              run: |
-                  sudo apt-get update
-                  sudo apt-get install -y python3-pip ninja-build
-                  pip3 install meson
-                  xargs -a .github/dependencies sudo apt-get install -y
-
-            - name: Compile
-              run: |
-                  CXX=g++ CXX_LD=bfd meson setup target
-                  meson compile -C target
+            - name: Build
+              run: ninja -C builddir
